@@ -28,5 +28,35 @@ const getTask = async(req, res)=>{
         res.status(500).json({ error: error.message });
       }
 }
+const updateTask = async(req, res) =>{
+  const { id } = req.params;
+  const updateFields = {};
 
-module.exports = {createTask, getTask}
+  if (req.body.timeEstimate !== undefined) {
+    const timeEstimate = req.body.timeEstimate;
+    if (timeEstimate.toString().split('.')[1]?.length > 2 || timeEstimate.toString().split('.')[1] > 59) {
+      return res.status(400).json({ error: 'Decimal part must be between 0 and 59' });
+    }
+    updateFields.timeEstimate = timeEstimate;
+  }
+
+  if (req.body.estimateNotes !== undefined) {
+    updateFields.estimateNotes = req.body.estimateNotes;
+  }
+
+  try {
+    const task = await Task.findOneAndUpdate(
+      { _id: id },
+      { $set: updateFields },
+      { returnOriginal: false }
+    );
+    if (!task) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+    res.status(200).json({message: "Taks updated successfully", data: task});
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+}
+
+module.exports = {createTask, getTask, updateTask}
