@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 // import './TaskModal.css';
 
 const UpdateTaskModal = ({ show, handleClose, task, onTaskUpdated }) => {
@@ -14,8 +15,10 @@ const UpdateTaskModal = ({ show, handleClose, task, onTaskUpdated }) => {
       const response = await axios.put(`http://localhost:5000/api/tasks/${task._id}`, {estimateNotes });
       console.log(response.data.data);
       onTaskUpdated(response.data.data);
+      toast.success('Successfully updated!');
     } catch (error) {
       console.error('Error updating task:', error);
+      toast.error(error?.response?.data?.error)
     }
   };
 

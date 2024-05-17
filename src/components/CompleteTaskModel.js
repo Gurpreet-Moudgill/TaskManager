@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 // import './CompleteTaskModal.css'; // Import custom CSS for the modal
 
 const CompleteTaskModal = ({ show, handleClose, task, onTaskCompleted }) => {
@@ -17,8 +18,10 @@ const CompleteTaskModal = ({ show, handleClose, task, onTaskCompleted }) => {
       });
       console.log(response);
       onTaskCompleted(response.data);
+      toast.success('Successfully completed!');
     } catch (error) {
       console.error('Error completing task:', error);
+      toast.error(error?.response?.data?.error)
     }
   };
 

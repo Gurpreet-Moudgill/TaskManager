@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 // import './TaskModal.css';
 
 const CreateTaskModal = ({ show, handleClose, onTaskCreated }) => {
@@ -15,8 +16,10 @@ const CreateTaskModal = ({ show, handleClose, onTaskCreated }) => {
     try {
       const response = await axios.post('http://localhost:5000/api/tasks',{ taskNumber, timeEstimate, estimateNotes });
       onTaskCreated(response.data.data);
+      toast.success('Successfully created!');
     } catch (error) {
       console.error('Error creating task:', error);
+      toast.error(error?.response?.data?.error)
     }
   };
 
