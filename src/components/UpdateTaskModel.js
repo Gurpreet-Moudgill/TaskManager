@@ -1,10 +1,9 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-// import './CompleteTaskModal.css'; // Import custom CSS for the modal
+// import './TaskModal.css';
 
-const CompleteTaskModal = ({ show, handleClose, task, onTaskCompleted }) => {
-  const [actualHours, setActualHours] = useState('');
-  const [finalNotes, setFinalNotes] = useState('');
+const UpdateTaskModal = ({ show, handleClose, task, onTaskUpdated }) => {
+  const [estimateNotes, setEstimateNotes] = useState(task.estimateNotes);
 
   if (!show) {
     return null;
@@ -12,13 +11,11 @@ const CompleteTaskModal = ({ show, handleClose, task, onTaskCompleted }) => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(`http://localhost:5000/api/tasks/${task._id}/complete`, {
-        actualHours, finalNotes 
-      });
-      console.log(response);
-      onTaskCompleted(response.data);
+      const response = await axios.put(`http://localhost:5000/api/tasks/${task._id}`, {estimateNotes });
+      console.log(response.data.data);
+      onTaskUpdated(response.data.data);
     } catch (error) {
-      console.error('Error completing task:', error);
+      console.error('Error updating task:', error);
     }
   };
 
@@ -26,7 +23,7 @@ const CompleteTaskModal = ({ show, handleClose, task, onTaskCompleted }) => {
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h5 className="modal-title">Complete Task</h5>
+          <h5 className="modal-title">Update Task</h5>
           <button type="button" className="close" onClick={handleClose}>
             &times;
           </button>
@@ -34,24 +31,33 @@ const CompleteTaskModal = ({ show, handleClose, task, onTaskCompleted }) => {
         <div className="modal-body">
           <form>
             <div className="form-group">
-              <label>Actual Hours</label>
+              <label>Task Number</label>
+              <input
+                type="text"
+                className="form-control"
+                value={task.taskNumber}
+                readOnly
+              />
+            </div>
+            <div className="form-group">
+              <label>Time Estimate</label>
               <input
                 type="number"
                 step="0.01"
                 min="0"
+                max="23.59"
                 className="form-control"
-                value={actualHours}
-                onChange={(e) => setActualHours(e.target.value)}
-                required
+                value={task.timeEstimate}
+                readOnly
               />
             </div>
             <div className="form-group">
-              <label>Final Notes</label>
+              <label>Estimate Notes</label>
               <textarea
                 className="form-control"
                 rows="3"
-                value={finalNotes}
-                onChange={(e) => setFinalNotes(e.target.value)}
+                value={estimateNotes}
+                onChange={(e) => setEstimateNotes(e.target.value)}
                 required
               />
             </div>
@@ -70,4 +76,4 @@ const CompleteTaskModal = ({ show, handleClose, task, onTaskCompleted }) => {
   );
 };
 
-export default CompleteTaskModal;
+export default UpdateTaskModal;

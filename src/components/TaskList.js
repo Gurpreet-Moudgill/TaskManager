@@ -3,12 +3,16 @@ import { Button } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table'
 import TaskItem from './TaskItem';
 import CompleteTaskModal from './CompleteTaskModel';
+import CreateTaskModal from './CreateTask';
+import UpdateTaskModal from './UpdateTaskModel';
 import axios from 'axios';
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -19,23 +23,54 @@ const TaskList = () => {
     loadTasks();
   }, []);
 
-  const handleCompleteTask = (task) => {
-    setSelectedTask(task);
-    setShowModal(true);
+  const handleShowCreateModal = () => {
+    setShowCreateModal(true);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
+  const handleCloseCreateModal = () => {
+    setShowCreateModal(false);
+  };
+
+  const handleShowUpdateModal = (task) => {
+    setSelectedTask(task);
+    setShowUpdateModal(true);
+  };
+
+  const handleCloseUpdateModal = () => {
+    setShowUpdateModal(false);
     setSelectedTask(null);
   };
 
-  const handleTaskCompleted = (updatedTask) => {
+  const handleShowCompleteModal = (task) => {
+    setSelectedTask(task);
+    setShowCompleteModal(true);
+  };
+
+  const handleCloseCompleteModal = () => {
+    setShowCompleteModal(false);
+    setSelectedTask(null);
+  };
+
+  const handleTaskCreated = (newTask) => {
+    setTasks([...tasks, newTask]);
+    handleCloseCreateModal();
+  };
+
+  const handleTaskUpdated = (updatedTask) => {
     setTasks(tasks.map(task => task._id === updatedTask._id ? updatedTask : task));
-    handleCloseModal();
+    handleCloseUpdateModal();
+  };
+
+  const handleTaskCompleted = (updatedTask) => {
+    setTasks(tasks.map(task => task?._id === updatedTask?._id ? updatedTask : task));
+    handleCloseCompleteModal();
   };
 
   return (
     <>
+      <Button className="mb-3" onClick={handleShowCreateModal}>
+        Create Task
+      </Button>
       <Table striped bordered hover responsive className="task-table">
         <thead>
           <tr>
@@ -43,18 +78,37 @@ const TaskList = () => {
             <th>Time Estimate</th>
             <th>Estimate Notes</th>
             <th>Actions</th>
+            <th>Udpate</th>
           </tr>
         </thead>
         <tbody>
           {tasks.map(task => (
-            <TaskItem key={task._id} task={task} onComplete={handleCompleteTask} />
+            <TaskItem
+            key={task._id}
+            task={task}
+            onEdit={() => handleShowUpdateModal(task)}
+            onComplete={() => handleShowCompleteModal(task)}
+          />
           ))}
         </tbody>
       </Table>
+      <CreateTaskModal
+        show={showCreateModal}
+        handleClose={handleCloseCreateModal}
+        onTaskCreated={handleTaskCreated}
+      />
+      {selectedTask && (
+        <UpdateTaskModal
+          show={showUpdateModal}
+          handleClose={handleCloseUpdateModal}
+          task={selectedTask}
+          onTaskUpdated={handleTaskUpdated}
+        />
+      )}
       {selectedTask && (
         <CompleteTaskModal
-          show={showModal}
-          handleClose={handleCloseModal}
+          show={showCompleteModal}
+          handleClose={handleCloseCompleteModal}
           task={selectedTask}
           onTaskCompleted={handleTaskCompleted}
         />
