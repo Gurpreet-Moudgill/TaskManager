@@ -23,7 +23,7 @@ const createTask = async(req, res)=>{
 const getTask = async(req, res)=>{
     try {
         const tasks = await Task.find();
-        res.status(200).json({message: "Tasks fetched successfuly",});
+        res.status(200).json({message: "Tasks fetched successfuly", data: tasks});
       } catch (error) {
         res.status(500).json({ error: error.message });
       }
